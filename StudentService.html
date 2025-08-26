@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@ViewBag.Title - Student CRUD Operations With Many Features</title>
+</head>
+<body style="text-align: center; margin-top: 50px;">
+    <h1>Web API Student CRUD With Many More Functionality.</h1>
+    <button id="dspbtn">Display All Students</button>
+    <button id="dspidbtn">Display Student By Id</button>
+    <button id="crtbtn">Create New Student</button>
+    <button id="updtbtn">Update Student</button>
+    <button id="dltbtn">Delete Student</button><br><br>
+    <input id="searchBox" type="text" placeholder="Search For Students.....">
+    <input id="clr" type="button" value="Clear"><br><br>
+    <button id="srchbtn">Get Matched Rows</button>
+    <button id="BackToList">Back To List</button>
+    <script src="Scripts/jquery-3.7.0.js"></script>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <link href="index.css" rel="stylesheet">
+    
+    <script>
+        $(document).ready(function () {
+            //For Clear Input Search Box Inner Typed Text.
+            $('#clr').click(function () {
+                $('#searchBox').val("");
+            });
+
+            //Search Matched String in Database Table & Display Records Accordingly.
+            $('#srchbtn').click(function () {
+                let srchBoxStr = $('#searchBox').val();
+
+                $.ajax({
+                    url: 'https://localhost:44372/api/Student/Search',
+                    method: 'POST',
+                    data: JSON.stringify(srchBoxStr),
+                    contentType: "application/json",
+                    success: function (data) {
+                        $('#msg').empty();
+                        let row = "";
+                        $('#tblBody').empty();
+                        $.each(data, function (i, Student) {
+                            row = "<tr>" +
+                                "<td>" + Student.Id + "</td>" +
+                                "<td>" + Student.FirstName + "</td>" +
+                                "<td>" + Student.LastName + "</td>" +
+                                "<td>" + Student.Course + "</td>" +
+                                "<td>" + Student.Marks + "</td>" +
+                                "<td>" + Student.Gender + "</td>" +
+                                "</tr>";
+                            $('#tblBody').append(row);
+                        });
+                    },
+                    error: function (xhr) {
+                        $('#tblBody').empty();
+                        $('#msg').empty();
+                        $('#formContainer').empty();
+                        $('#studentForm').empty();
+                        $('#msg').text(xhr.responseText);
+                    }
+                });
+            });
+
+            // Trigger Display All Students When Back To List Button Is Clicked
+            $('#BackToList').click(function () {
+                $('#dspbtn').trigger('click');
+            });
+
+            $('#tblBody').empty();
+            $('#msg').empty();
+
+            //Display All Student Records From Table Student
+            $('#dspbtn').click(function () {
+                $('#formContainer').empty();
+                $.ajax({
+                    url: 'https://localhost:44372/api/Student',
+                    method: 'GET',
+                    success: function (data) {
+                        $('#msg').empty();
+                        let row = "";
+                        $('#tblBody').empty();
+                        $.each(data, function (i, Student) {
+                            row = "<tr>" +
+                                "<td>" + Student.Id + "</td>" +
+                                "<td>" + Student.FirstName + "</td>" +
+                                "<td>" + Student.LastName + "</td>" +
+                                "<td>" + Student.Course + "</td>" +
+                                "<td>" + Student.Marks + "</td>" +
+                                "<td>" + Student.Gender + "</td>" +
+                                "</tr>";
+                            $('#tblBody').append(row);
+                        });
+                    }
+                });
+            });
+
+            //Display Student Record By Their Id
+            $('#dspidbtn').click(function () {
+                $('#tblBody').empty();
+                $('#msg').empty();
+                var htmlform = '<form id="stdForm"><br>' +
+                    '<label><b>Enter Student ID:</b></label><br><br>' +
+                    '<input id="stdId" type="number" placeholder="Enter Student Id" name="val"><br><br>' +
+                    '<input type="submit" value="Submit">'
+                    + '</form>';
+                $('#formContainer').html(htmlform);
+                $('#stdForm').submit(function (e) {
+                    e.preventDefault();
+                    var val = $('#stdId').val();
+                    console.log(typeof (val));
+                    if (val == null || val == "") {
+                        $('#msg').html("<b>Warning: Id Can't be Null. You Must Enter Some Positive Value.</b>");
+                    } else {
+                        $.ajax({
+                            url: 'https://localhost:44372/api/Student/' + val,
+                            method: 'GET',
+                            success: function (data) {
+                                $('#msg').empty();
+                                let row = "";
+                                $('#tblBody').empty();
+                                row = "<tr>" +
+                                    "<td>" + data.Id + "</td>" +
+                                    "<td>" + data.FirstName + "</td>" +
+                                    "<td>" + data.LastName + "</td>" +
+                                    "<td>" + data.Course + "</td>" +
+                                    "<td>" + data.Marks + "</td>" +
+                                    "<td>" + data.Gender + "</td>" +
+                                    + "</tr>";
+                                $('#tblBody').append(row);
+                            },
+                            error: function (xhr) {
+                                $('#msg').html('<b>Error: ' + xhr.responseText + '</b>');
+                                $('#tblBody').empty();
+                            }
+                        });
+                    }
+                })
+            });
+
+            //Create Student Record In Database Table
+            $('#crtbtn').click(function () {
+                $('#tblBody').empty();
+                $('#msg').empty();
+                var htmlform = '<form id="stdForm"><br>' +
+                    '<label><b>Enter Student Data:</b></label><br><br>' +
+                    '<input id="Id" type="number" placeholder="Enter Student Id" name="stdId"><br><br>' +
+                    '<input id="Fname" type="text" placeholder="Enter Student First Name" name="stdFname" required><br><br>' +
+                    '<input id="Lname" type="text" placeholder="Enter Student Last Name" name="stdLname" required><br><br>' +
+                    '<input id="crc" type="text" placeholder="Enter Student Course" name="stdcrc" required><br><br>' +
+                    '<input id="mrks" type="number" placeholder="Enter Student Marks" name="stdmrks" required><br><br>' +
+                    '<input id="Gender" type="text" placeholder="Enter Student Gender" name="stdGender" required><br><br>' +
+                    '<input id="submit" type="submit" value="Submit">'
+                    + '</form>';
+                $('#formContainer').html(htmlform);
+                $('#stdForm').submit(function (e) {
+                    e.preventDefault();
+                    var student = {
+                        FirstName: $('#Fname').val(),
+                        Gender: $('#Gender').val(),
+                        Id: $('#Id').val(),
+                        LastName: $('#Lname').val(),
+                        Course: $('#crc').val(),
+                        Marks: $('#mrks').val()
+                    }
+
+                    $.ajax({
+                        url: 'https://localhost:44372/api/Student',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(student),
+                        success: function (response) {
+                            $('#msg').empty();
+                            alert("Student Data Saved Successfully.");
+                            $('#formContainer').empty();
+                        },
+                        error: function (xhr) {
+                            if (xhr.status === 409) {
+                                $('#msg').html("<b>Error:Student Id Already Exist.</b>");
+                            } else {
+                                $('#msg').text(xhr.responseText);
+                            }
+                            $('#tblBody').empty();
+                            $('#formContainer').empty();
+                        }
+                    });
+                });
+            });
+
+            //Update Student Record From Table.
+            $('#updtbtn').click(function () {
+                $('#tblBody').empty();
+                $('#msg').empty();
+                var htmlForm = '<form id="stdForm"><br>' +
+                    '<label><b>Enter Student Id For Update</b></label><br><br>' +
+                    '<input id="stdId" type="number" placeholder="Enter Student Id" name="val"><br><br>' +
+                    '<input type="submit" value="Submit">'
+                    + '</form > ';
+                $('#formContainer').html(htmlForm);
+                $('#stdForm').submit(function (e) {
+                    e.preventDefault();
+                    var stdid = $('#stdId').val();
+                    if (stdid == "") {
+                        $("#msg").html("<b>Error: Id Must Be Positive Not Null.</b>");
+                    } else {
+                        $.ajax({
+                            url: 'https://localhost:44372/api/Student/' + stdid,
+                            method: 'GET',
+                            success: function (data) {
+                                $('#msg').empty();
+                                console.log("First API Call Successfull.");
+                                var UpdtStudent = '<form id="stdForm"><br>' +
+                                    '<label><b>Update Following Student Data:</b></label><br><br>' +
+                                    '<input id="fname" type="text" placeholder="First Name" value="' + data.FirstName + '" required><br><br>' +
+                                    '<input id="lname" type="text" placeholder="Last Name" value="' + data.LastName + '" required><br><br>' +
+                                    '<input id="stdcrc" type="text" placeholder="Course" value="' + data.Course + '" required><br><br>' +
+                                    '<input id="stdmrks" type="number" placeholder="Marks" value="' + data.Marks + '" required><br><br>' +
+                                    '<input id="stdgender" type="text" placeholder="Gender" value="' + data.Gender + '" required><br><br>' +
+                                    '<input id="submit" type="submit" value="Submit">'
+                                    + '</form>';
+                                $('#formContainer').html(UpdtStudent);
+                                $('#stdForm').submit(function (e) {
+                                    e.preventDefault();
+                                    var student = {
+                                        FirstName: $('#fname').val(),
+                                        Gender: $('#stdgender').val(),
+                                        LastName: $('#lname').val(),
+                                        Course: $('#stdcrc').val(),
+                                        Marks: $('#stdmrks').val()
+                                    }
+                                    $.ajax({
+                                        url: 'https://localhost:44372/api/Student/' + stdid,
+                                        method: 'PUT',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(student),
+                                        success: function (response) {
+                                            $('#msg').empty();
+                                            console.log("Second API Call Successfull.");
+                                            alert("Student Data Saved Successfully.");
+                                            $('#studentForm').empty();
+                                            $('#tblBody').empty();
+                                            $('#formContainer').empty();
+                                        },
+                                        error: function (xhr) {
+                                            $('#msg').text(xhr.responseText);
+                                        }
+                                    });
+                                });
+                            },
+                            error: function (xhr) {
+                                $('#msg').text(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Delete Student Record From Table.
+            $('#dltbtn').click(function () {
+                $('#tblBody').empty();
+                $('#msg').empty();
+                $('#formContainer').empty();
+                var htmlform = '<form id="stdForm"><br>' +
+                    '<label><b>Enter Student ID To Delete:</b></label><br><br>' +
+                    '<input id="stdid" type="number" placeholder="Enter Student ID"/><br><br>' +
+                    '<input id="submit" type="submit" value="Submit"/>' +
+                    '</form>';
+                $('#formContainer').html(htmlform);
+                $('#stdForm').submit(function (e) {
+                    e.preventDefault();
+                    var id = $('#stdid').val();
+                    if (id <= 0) {
+                        $('#msg').html('<b>Error: Id Can not be negative or Equal To Zero.</b>');
+                    } else {
+                        $.ajax({
+                            url: 'https://localhost:44372/api/Student/' + id,
+                            method: 'GET',
+                            success: function (data) {
+                                $('#msg').empty();
+                                $('#formContainer').empty();
+                                console.log("First API Call Successfull1.");
+                                var DltStudent = '<form id="stdForm"><br>' +
+                                    '<label><b>You Are Deleting Following Student Data:</b></label><br><br>' +
+                                    '<input id="fname" type="text" placeholder="First Name" value="' + data.FirstName + '" disabled><br><br>' +
+                                    '<input id="lname" type="text" placeholder="Last Name" value="' + data.LastName + '" disabled><br><br>' +
+                                    '<input id="stdcrc" type="text" placeholder="Course" value="' + data.Course + '" disabled><br><br>' +
+                                    '<input id="stdmrks" type="text" placeholder="Marks" value="' + data.Marks + '" disabled><br><br>' +
+                                    '<input id="stdgender" type="text" placeholder="Gender" value="' + data.Gender + '" disabled><br><br>' +
+                                    '<input id="delete" type="submit" value="Delete">  ' +
+                                    ' <input id="cancel" type="button" value="Cancel">'
+                                    + '</form>';
+                                $('#formContainer').html(DltStudent);
+                                $('#stdForm').submit(function (e) {
+                                    $('#msg').empty();
+                                    e.preventDefault();
+                                    if (confirm("Are You Sure ,You Want To Delete This Student ?")) {
+                                        $.ajax({
+                                            url: 'https://localhost:44372/api/Student/' + id,
+                                            method: 'DELETE',
+                                            success: function (data) {
+                                                alert("Student Deleted Successfully.");
+                                                $('#formContainer').empty();
+                                            },
+                                            error: function (err) {
+                                                alert("Delete Student With Id= " + id + " is Failed.");
+                                                $('#formContainer').empty();
+                                            }
+                                        });
+                                    } else {
+                                        alert("Deletion Of Student Canceled.");
+                                    }
+                                });
+                                $("#cancel").click(function () {
+                                    if (confirm("Are you sure you want to cancel?")) {
+                                        $("#formContainer").empty();
+                                    }
+                                });
+                            },
+                            error: function (xhr) {
+                                $('#msg').text(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            //Sorting Based On Table Header (Toggle To ASC & DESC)
+            let SortOrder = 'desc';
+            function LoadData(SortBy, htmlElemt_th) {
+                $('th span').text("");
+                $(htmlElemt_th).find("span").text(SortOrder === "asc" ? "▲" : "▼");
+                SortOrder = (SortOrder === "asc") ? "desc" : "asc";
+                $.ajax({
+                    url: 'https://localhost:44372/api/Student/GetStudents',
+                    method: 'GET',
+                    data: { sortby: SortBy, sortorder: SortOrder },
+                    success: function (students) {
+                        let rows = "";
+                        students.forEach(s => {
+                            rows += `<tr>
+                                     <td>${s.Id}</td>
+                                     <td>${s.FirstName}</td>
+                                     <td>${s.LastName}</td>
+                                     <td>${s.Course}</td>
+                                     <td>${s.Marks}</td>
+                                     <td>${s.Gender}</td>
+                                     </tr>`;
+                        });
+                        $("#tblBody").html(rows);
+                    },
+                    error: function (xhr) {
+                        $('#msg').text(xhr.responseText);
+                    }
+                });
+            }
+            window.LoadData = LoadData;
+            LoadData('Id');
+
+            // Show Pagination Method Codes Here With jQuery/Ajax Code.
+            function ShowPg(start, end) {
+                $.ajax({
+                    url: 'https://localhost:44372/api/Student/ShowPages',
+                    method: 'GET',
+                    data: { start: start, end: end },
+                    success: function (students) {
+                        console.log("API response:", students);
+                        var rows = "";
+                        $.each(students, function (i, student) {
+                            rows += '<tr>' +
+                                "<td>" + student.Id + "</td>" +
+                                "<td>" + student.FirstName + "</td>" +
+                                "<td>" + student.LastName + "</td>" +
+                                "<td>" + student.Course + "</td>" +
+                                "<td>" + student.Marks + "</td>" +
+                                "<td>" + student.Gender + "</td>" +
+                                '</tr>';
+                        });
+                        $("#tblBody").html(rows);
+                    },
+                    error: function (xhr) {
+                        $('#msg').text(xhr.responseText);
+                    }
+                });
+            }
+            window.ShowPg = ShowPg;
+        });
+
+    </script>
+    <br><br>
+
+    <!--Table Header Code Here With Icon ASC & DESC-->
+    <table border="1" cellpadding="5" cellspacing="0" align="center">
+        <thead>
+            <tr>
+                <th onclick="LoadData('Id',this)">Id <span></span></th>
+                <th onclick="LoadData('FirstName',this)">FirstName <span></span></th>
+                <th onclick="LoadData('LastName',this)">LastName <span></span></th>
+                <th onclick="LoadData('Course',this)">Course <span></span></th>
+                <th onclick="LoadData('Marks',this)">Marks <span></span></th>
+                <th onclick="LoadData('Gender',this)">Gender <span></span></th>
+            </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+    </table>
+    <script>
+
+    </script>
+    <div id="formContainer"></div>
+    <div id="msg" style="color:red;"></div>
+
+    <!--Pagination-->
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a onclick="ShowPg(1,5)" id="pg1" class="page-link"><b>1-5</b></a></li>
+        <li class="page-item"><a onclick="ShowPg(6,10)" id="pg2" class="page-link"><b>6-10</b></a></li>
+        <li class="page-item"><a onclick="ShowPg(11,15)" id="pg3" class="page-link"><b>11-15</b></a></li>
+        <li class="page-item"><a onclick="ShowPg(16,20)" id="pg4" class="page-link"><b>15-20</b></a></li>
+    </ul>
+</body>
+</html>

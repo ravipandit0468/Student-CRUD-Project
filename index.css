@@ -1,0 +1,79 @@
+﻿input {
+    padding: 12px;
+    font-size: 24px !important;
+    width: 330px;
+    border-radius: 9px;
+    font-weight: 700;
+}
+input[type="button"] {
+    cursor: pointer;
+    width: 100px;
+}
+button {
+    padding: 12px;
+    font-size: 20px;
+    font-weight:600;
+    width: 230px;
+    border-radius: 8px;
+    background: blue;
+    color: white;
+    cursor: pointer;
+}
+#srchbtn {
+    font-weight: 600;
+}
+
+button:hover {
+    background: darkblue;
+}
+
+h1 {
+    font-family: Arial;
+    font-weight:600;
+}
+table {
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-size: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th {
+    border: 1px solid black;
+    color: red;
+    padding: 8px;
+    background: aqua;
+    cursor: pointer;
+}
+
+label {
+    font-family: Arial;
+    font-size: 20px;
+}
+
+#studentForm, #msg {
+    font-family: Arial;
+    font-size: 20px;
+    padding: 8px;
+    font-weight: 600;
+}
+span {
+    color: darkblue;
+}
+
+td {
+    border: 1px solid black
+}
+
+b {
+    font-size: 15px;
+}
+
+li {
+    width: 80px;
+}
+
+ul {
+    cursor: pointer;
+}
